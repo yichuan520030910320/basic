@@ -21,7 +21,21 @@
 #include "../StanfordCPPLib/simpio.h"
 #include "../StanfordCPPLib/strlib.h"
 using namespace std;
-bool isNum(string str);
+bool isNum(string str)//a function to check is num
+{
+    stringstream sin(str);
+    double d;
+    char c;
+    if(!(sin >> d))
+    {
+        return false;
+    }
+    if (sin >> c)
+    {
+        return false;
+    }
+    return true;
+}
 /* Function prototypes */
 
 void processLine(string line, Program & program, EvalState & state);
@@ -131,18 +145,3 @@ cout<<"babalala"<<endl;
 }
 
 
-bool isNum(string str)//a function to check is num
-{
-    stringstream sin(str);
-    double d;
-    char c;
-    if(!(sin >> d))
-    {
-        return false;
-    }
-    if (sin >> c)
-    {
-        return false;
-    }
-    return true;
-}

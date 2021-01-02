@@ -78,6 +78,7 @@ Statement *Program::getParsedStatement(int lineNumber) {
 
 int Program::getFirstLineNumber() {
     if (!Lineset.empty()) { return Lineset.begin()->first; }
+    else return 0;
        // Replace this stub with your own code
 }
 
@@ -106,14 +107,23 @@ void Program::RUN(EvalState & state){
         map<int,Line>::iterator iter;
         iter = Lineset.begin();
         while(iter != Lineset.end()){
-            //cout<<"IIII"<<endl;
             Statement *temp;
             temp=parsestatement(1,iter->second.lineptr);
-            temp->execute(state);
+            try {
+                temp->execute(state);
+            } catch (skipline temp) {
+                if (temp.action==0) {break;}
+                if (temp.action==1){map<int,Line>::iterator tmp;
+                    tmp=Lineset.find(temp.linenum);
+                    if(tmp == Lineset.end()) cout<<"LINE NUMBER ERROR"<<endl;
+                    else {
+                        iter = tmp;
+                        continue;
+                    }
+                }
+            }
             delete temp;
             iter++;
         }
-        //cout<<iSize<<"(((((("<<endl;
-
     }
 }

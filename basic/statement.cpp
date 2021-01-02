@@ -50,13 +50,38 @@ Statement *parsestatement(bool ifhaslinenum,string index){
     } else if (token=="PRINT"){ Expression *exp = parseExp(scanner);
         return new PRINT(exp);
         }
-    else if (token=="LET"){Expression *exp = parseExp(scanner);
-        return new LET(exp);}
-    else if (token=="END"){}
-    else if (token=="IF"){}
-    else if (token=="GOTO"){}
+    else if (token=="LET"){
+       // cout<<"fuuuuuuuuck"<<endl;
+        Expression *exp = parseExp(scanner);
+        return new LET(exp);
+    }
+    else if (token=="END"){
+        return new END();}
+    else if (token=="IF"){
+        Expression *exp = parseExp(scanner);
+        Expression*temp1=readT(scanner);
+        if (temp1->getType()!=IDENTIFIER) {error("SYNTAX ERROR");}
+        Expression* temp2=readT(scanner);
+        if (temp2->toString()!="="&&temp2->toString()!="<"&&temp2->toString()!=">") {error("SYNTAX ERROR");}
+        Expression* temp3=readT(scanner);
+        if (temp3->getType()!=IDENTIFIER) {error("SYNTAX ERROR");}
+
+        Expression* temp4=parseExp(scanner);
+        if (temp4->toString()!="THEN") {error("SYNTAX ERROR");}
+
+        Expression*temp5=parseExp(scanner);
+        if (temp5->getType()!=CONSTANT){error("SYNTAX ERROR");}
+
+        return new IF(temp1,temp2,temp3,temp4,temp5);
+    }
+    else if (token=="GOTO"){
+        Expression *exp = parseExp(scanner);
+        return new GOTO(exp);
+    }
     else if (token=="REM"){//do nothing
-         }
+        Expression *exp = parseExp(scanner);
+        return new REM(exp);
+       }
     else {error("SYNTAX ERROR");}
 }
 INPUT::INPUT(Expression *temp) {  ptr=temp;}
@@ -71,12 +96,9 @@ void INPUT:: execute(EvalState & state) {
         } catch (...) {
             cout<<"INVALID NUMBER"<<endl;
             continue;
-
         }
         break;
     }
     state.setValue(((IdentifierExp *) ptr)->getName(),value);
 }
-REM::REM() {};
-REM::~REM() noexcept {};
-void REM:: execute(EvalState & state){};
+

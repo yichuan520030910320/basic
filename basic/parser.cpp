@@ -39,7 +39,7 @@ Expression *parseExp(TokenScanner & scanner) {
  * than the prevailing one.  When a higher-precedence operator is found,
  * readE calls itself recursively to read in that subexpression as a unit.
  */
-
+//read as a unit
 Expression *readE(TokenScanner & scanner, int prec) {
     //cout<<"readE)))))"<<endl;
    Expression *exp = readT(scanner);
@@ -62,7 +62,7 @@ Expression *readE(TokenScanner & scanner, int prec) {
  * This function scans a term, which is either an integer, an identifier,
  * or a parenthesized subexpression.
  */
-
+//scan a word
 Expression *readT(TokenScanner & scanner) {
    string token = scanner.nextToken();
    //cout<<token<<" "<<999<<endl;
