@@ -14,13 +14,28 @@
 #include "exp.h"
 #include "parser.h"
 #include "program.h"
+#include "statement.h"
 #include "../StanfordCPPLib/error.h"
 #include "../StanfordCPPLib/tokenscanner.h"
 #include <sstream>
 #include "../StanfordCPPLib/simpio.h"
 #include "../StanfordCPPLib/strlib.h"
 using namespace std;
-bool isNum(string str);
+bool isNum(string str)//a function to check is num
+{
+    stringstream sin(str);
+    double d;
+    char c;
+    if(!(sin >> d))
+    {
+        return false;
+    }
+    if (sin >> c)
+    {
+        return false;
+    }
+    return true;
+}
 /* Function prototypes */
 
 void processLine(string line, Program & program, EvalState & state);
@@ -61,6 +76,7 @@ void processLine(string line, Program & program, EvalState & state) {
    scanner.scanNumbers();//enter the pattern of being able to read num
    //cout<<scanner.scanNumbersFlag<<endl;
    scanner.setInput(line);
+
    if (line=="QUIT") exit(0);
    if (scanner.hasMoreTokens()){
        string token = scanner.nextToken();
@@ -70,8 +86,10 @@ void processLine(string line, Program & program, EvalState & state) {
       // cout<<scanner.nextToken()<<endl;
        if (isNum(token)){//with num
 if (scanner.hasMoreTokens()) {//maybe need to transfer
+
     const char *token_ = token.c_str();
     program.addSourceLine(atoi(token_), line);
+
 } else{ const char *token_ = token.c_str();
     program.removeSourceLine(atoi(token_));
 }
@@ -88,6 +106,8 @@ if (scanner.hasMoreTokens()) {//maybe need to transfer
                }
                if (token=="LET"){
                    string temp1=scanner.nextToken();
+                   //cout<<temp1<<endl;
+                   if (temp1=="LET"||temp1=="INPUT"||temp1=="QUIT"||temp1=="PRINT") error("SYNTAX ERROR");
                    if (!scanner.hasMoreTokens()) error("SYNTAX ERROR");
                    string sign=scanner.nextToken();
                    //cout<<sign<<endl;
@@ -99,59 +119,34 @@ if (scanner.hasMoreTokens()) {//maybe need to transfer
                    //cout<<scanner.nextToken()<<endl;
                 //if ()
                }
-               if (token=="INPUT"){
-                   string temp1=scanner.nextToken();
-                   cout<<endl;
-                   cout<<'?';
-                   string temp2=scanner.nextToken();
-                   //if (!isNum(temp2))
-
+               if (token=="INPUT"){//the next lines may be cut
+//                   string temp1=scanner.nextToken();
+//                   cout<<endl;
+//                   cout<<'?';
+//                   string temp2=scanner.nextToken();
+Statement *temp= nullptr;
+temp=parsestatement(0,line);
+//cout<<"******"<<endl;
+temp->execute(state);
+                   delete temp;
                }
            }
        } else{//list quit...
-
+if (token=="LIST") {
+program.PRINT();
+} else if (token=="HELP"){
+//do nothing
+cout<<"babalala"<<endl;
+} else if (token=="CLEAR"){
+    program.clear();
+} else if (token=="RUN"){
+    program.RUN( state);
+} else{
+    error("SYNTAX ERROR");
+}
        }
 
    } else return;
-//    while (scanner.hasMoreTokens()) {
-//        string token = scanner.nextToken();
-//        cout<<token<<endl;
-//    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//   Expression *exp = parseExp(scanner);
-//   //Expression *t=readT(scanner);
-//
-//   int value = exp->eval(state);
-//   //cout<<value<<endl;
-//   cout << value<< endl;
-//   delete exp;
 }
 
 
-bool isNum(string str)//a function to check is num
-{
-    stringstream sin(str);
-    double d;
-    char c;
-    if(!(sin >> d))
-    {
-        return false;
-    }
-    if (sin >> c)
-    {
-        return false;
-    }
-    return true;
-}

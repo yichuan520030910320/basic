@@ -21,10 +21,12 @@ using namespace std;
  * This code just reads an expression and then checks for extra tokens.
  */
 
-Expression *parseExp(TokenScanner & scanner) {
+Expression *parseExp(TokenScanner & scanner) {//IF may has problem
    Expression *exp = readE(scanner);
+   while (scanner.hasMoreTokens()){string a=scanner.nextToken();}//odd operater
+
    if (scanner.hasMoreTokens()) {
-      error("parseExp: Found extra token: " + scanner.nextToken());
+      error("parseExp: Found extra token: " + scanner.nextToken());//the error in 17 to ignore the white space
    }
    return exp;
 }
@@ -39,7 +41,7 @@ Expression *parseExp(TokenScanner & scanner) {
  * than the prevailing one.  When a higher-precedence operator is found,
  * readE calls itself recursively to read in that subexpression as a unit.
  */
-
+//read as a unit
 Expression *readE(TokenScanner & scanner, int prec) {
     //cout<<"readE)))))"<<endl;
    Expression *exp = readT(scanner);
@@ -62,7 +64,7 @@ Expression *readE(TokenScanner & scanner, int prec) {
  * This function scans a term, which is either an integer, an identifier,
  * or a parenthesized subexpression.
  */
-
+//scan a word
 Expression *readT(TokenScanner & scanner) {
    string token = scanner.nextToken();
    //cout<<token<<" "<<999<<endl;

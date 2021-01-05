@@ -7,7 +7,7 @@
 
 #ifndef _program_h
 #define _program_h
-
+#include <map>
 #include <string>
 #include "statement.h"
 using namespace std;
@@ -134,9 +134,16 @@ public:
  */
 
    int getNextLineNumber(int lineNumber);
+   void PRINT();
+   void RUN(EvalState & state);
 
 private:
-
+struct Line{
+    int linenum;
+    string lineptr;
+    Statement *linemeanig=nullptr;
+};
+map<int ,Line> Lineset;
 // Fill this in with whatever types and instance variables you need
 
 };

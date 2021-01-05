@@ -14,6 +14,7 @@
 
 #include "evalstate.h"
 #include "exp.h"
+#include "parser.h"
 
 /*
  * Class: Statement
@@ -24,6 +25,15 @@
  * for each of the statement and command types required for the
  * BASIC interpreter.
  */
+class skipline{
+public:
+    int action;
+    int linenum;
+    //0 END,1 CHANGE ,3
+    skipline(int a,int b ) {
+        action=a,linenum=b;
+    }
+};
 
 class Statement {
 
@@ -74,39 +84,72 @@ public:
  * an Expression object), the class implementation must also
  * specify its own destructor method to free that memory.
  */
+Statement *parsestatement(bool ifhaslinenum,string index);
 class LET: public Statement{
-private:
-public:LET();
+private:Expression *exp;
+public:LET(Expression* temp) {
+exp=temp;
+if (exp->getType()!=COMPOUND) {error("SYNTAX ERROR");}
+if (((CompoundExp*)exp)->getOp()!="=")  {error("SYNTAX ERROR");}
+}
 
-    virtual ~LET();
+    virtual ~LET(){
+        delete exp;};
    void execute(EvalState & state) {
-
-   }
+       exp->eval(state);}
 };
-class IF: public Statement{
+class INPUT: public Statement{
 private:
+public:INPUT(Expression* temp) ;
+
+    virtual ~INPUT();
+    void execute(EvalState & state) ;
+    Expression *ptr;
+};
+
+class IF: public Statement{
+private:Expression *ptr1;
+    Expression *ptr2;
+    Expression *ptr3;
+    Expression *ptr4;
+    Expression *ptr5;
 public:
-    IF() {}
-
+    IF(Expression* temp_1,Expression* temp_2,Expression* temp_3,Expression* temp_4,Expression* temp_5) {
+    temp_1=ptr1,temp_2=ptr2,temp_3=ptr3,temp_4=ptr4,temp_5=ptr5;
+}
     virtual ~IF() {
-
+        delete ptr5;delete ptr4;delete ptr3;delete ptr2;delete ptr1;
     }
 
     void execute(EvalState & state) {
 
+if (ptr2->toString()=="="){
+    if (ptr1->eval(state)==ptr3->eval(state)) throw skipline(1,stringToInteger(ptr5->toString()));
+} else if (ptr2->toString()=="<"){
+    if (ptr1->eval(state)<ptr3->eval(state)) throw skipline(1,stringToInteger(ptr5->toString()));
+} else if (ptr2->toString()==">"){
+    if (ptr1->eval(state)>ptr3->eval(state)) throw skipline(1,stringToInteger(ptr5->toString()));
+}
     }
 };
 class GOTO: public Statement{
-private:
+private: int linenum;Expression *Exp;
 public:
-    GOTO() {}
+    GOTO(Expression* temp) {
+        Exp=temp;
+        try {
+            linenum=stringToInteger(Exp->toString());
+        } catch (...) {
+            error("SYNTAX ERROR");
+        }
+    }
 
     virtual ~GOTO() {
-
+        delete Exp;
     }
 
     void execute(EvalState & state) {
-
+        throw skipline(1,linenum);
     }
 };
 class END: public Statement{
@@ -119,21 +162,17 @@ public:
     }
 
     void execute(EvalState & state) {
-
+        throw skipline(0,0);
     }
 };
-class REM: public Statement{
+class REM: public Statement{//finished
 private:
 public:
-    REM() {}
+    REM(Expression* temp){} ;
+    virtual ~REM(){};
+    void execute(EvalState & state){
 
-    virtual ~REM() {
-
-    }
-
-    void execute(EvalState & state) {
-
-    }
+    };
 };
 class PRINT: public Statement{
 private:Expression *content;
@@ -146,8 +185,9 @@ public:
         delete content;
     }
     void execute(EvalState & state) {
-    cout<<state.getValue(content->toString())<<endl;
+    cout<<content->eval(state)<<endl;
     }
 
 };
+
 #endif
